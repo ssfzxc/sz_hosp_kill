@@ -1,8 +1,10 @@
 [logger]
 name = jssz
+; 日志保存目录
 path = 
 
 [jssz12320]
-Cookie = 
+; cookie 文件路径
+cookiefile = 
 User-Agent = 
 params = {"hospName": "", "departName": "", "doctorName": "", "workDate": "", "workType": "", "name": "", "time": "10:00"}

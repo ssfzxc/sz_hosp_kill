@@ -24,13 +24,14 @@ class Kill:
             "time": "10:00",
         }
         """
+        _cookie_file = open(config.get("jssz12320", "cookiefile"), 'r')
         self._headers = {
             "Host": "wx.jssz12320.cn",
             "Origin": "http://wx.jssz12320.cn",
             "User-Agent": config.get('jssz12320', 'User-Agent'),
             "X-Requested-With": "com.tencent.mm",
             "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Cookie": config.get("jssz12320", "Cookie")
+            "Cookie": _cookie_file.read()
         }
         self._params = json.loads(config.get("jssz12320", "params"))
         self._client = aiohttp.ClientSession(headers=self._headers)
