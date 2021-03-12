@@ -42,15 +42,16 @@ class Kill:
     async def run(self):
         try:
             await self.login()
-            await self.list_depart_name(self._params.get('hospName'))
+            await self.list_depart_name(self._params.get('hospName'), 'normal')
+            await self.list_depart_name(self._params.get('hospName'), self._params.get("regType"))
+
+            point = await self.work_point()
+            if not point:
+                logger.info("号源已抢完,请等待重试!")
+            point = await self.register(**point)
+            user = await self.get_user()
             for _ in range(100):
-                point = await self.work_point()
-                if not point:
-                    logger.info("该时间未到抢号时间, 等待0.5s")
-                    await asyncio.sleep(0.5)
-                    continue
-                point = await self.register(**point)
-                user = await self.get_user()
+                await asyncio.sleep(0.5)
                 if await self.sumbit_register(**point, **user):
                     logger.info("抢号成功")
                     break
@@ -81,10 +82,10 @@ class Kill:
         """
         return self._hosp_name_list
 
-    async def list_depart_name(self, hosp_name):
+    async def list_depart_name(self, hosp_name, reg_type):
         url = "http://wx.jssz12320.cn/gh/register/showDepartList.ha"
-        payload = "hospName=%(hospName)s&regType=expert" % {
-            "hospName": hosp_name}
+        payload = "hospName=%(hospName)s&regType=%(regType)s" % {
+                "hospName": hosp_name, "regType": reg_type}
         logger.info("POST url: %s, payload: %s" % (url, payload))
         async with self._client.post(url=url, params=payload) as response:
             status_code = response.status
@@ -121,8 +122,7 @@ class Kill:
                 for item in points.get('poolList'):
                     if item.get('startTime') == self._params.get('time') and item.get('leftNum') > 0:
                         return item
-                    else:
-                        raise Exception("该时间段的号已被抢完,请更换时间抢号")
+                raise Exception("该时间段的号已被抢完,请更换时间抢号")
             else:
                 raise Exception("该医生<%s>的号已被抢完,请更换时间抢号" % self._params.get('workType'))
         return False
