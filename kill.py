@@ -122,7 +122,8 @@ class Kill:
                 for item in points.get('poolList'):
                     if item.get('startTime') == self._params.get('time') and item.get('leftNum') > 0:
                         return item
-                raise Exception("该时间段的号已被抢完,请更换时间抢号")
+                    else:
+                        raise Exception("该时间段的号已被抢完,请更换时间抢号")
             else:
                 raise Exception("该医生<%s>的号已被抢完,请更换时间抢号" % self._params.get('workType'))
         return False
